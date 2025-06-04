@@ -11,12 +11,14 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "sqlite-async": "^1.2.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.17",
     "@types/node": "^20.8.7",
+    "@types/sqlite3": "^3.1.11",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",

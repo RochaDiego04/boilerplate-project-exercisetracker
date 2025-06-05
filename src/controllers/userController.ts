@@ -39,10 +39,58 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
+export const getUserLogs = async (req: Request, res: Response) => {
+  const db = getDB(req);
+  const { from, to, limit } = req.query;
+  const userId = req.user?.id; // incoming accepted user ID from middleware
+
+  try {
+    let query = `
+      SELECT id, description, duration, date 
+      FROM exercises 
+      WHERE userId = ?
+    `;
+    const params: any[] = [userId];
+
+    if (from) {
+      query += " AND date(date) >= date(?)";
+      params.push(from);
+    }
+    if (to) {
+      query += " AND date(date) <= date(?)";
+      params.push(to);
+    }
+
+    if (limit) {
+      query += " LIMIT ?";
+      params.push(parseInt(limit as string));
+    }
+
+    const result = await db.all(query, ...params);
+
+    const formattedResult = result.map(
+      (ex: { date: string | number | Date }) => ({
+        ...ex,
+        date: new Date(ex.date).toDateString(),
+      })
+    );
+
+    res.json({
+      _id: userId,
+      username: req.user?.username,
+      count: formattedResult.length,
+      log: formattedResult,
+    });
+  } catch (err) {
+    console.error("Error fetching logs:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 export const createExercise = async (req: Request, res: Response) => {
   const db = getDB(req);
   const { description, duration, date } = req.body;
-  const userId = req.user.id; // incoming accepted user ID from middleware
+  const userId = req.user?.id; // incoming accepted user ID from middleware
 
   if (!description || !duration) {
     return res

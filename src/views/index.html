@@ -24,7 +24,11 @@
         <input id="uname" type="text" name="username" placeholder="username" />
         <input type="submit" value="Submit" />
       </form>
-      <form action="/api/users/:_id/exercises" id="exercise-form" method="post">
+      <form
+        action="/api/v1/users/:_id/exercises"
+        id="exercise-form"
+        method="post"
+      >
         <h2>Add exercises</h2>
         <p><code>POST /api/users/:_id/exercises</code></p>
         <input id="uid" type="text" name=":_id" placeholder=":_id" />
@@ -65,11 +69,35 @@
     <script>
       const exerciseForm = document.getElementById("exercise-form");
 
-      exerciseForm.addEventListener("submit", () => {
-        const userId = document.getElementById("uid").value;
-        exerciseForm.action = `/api/users/${userId}/exercises`;
+      exerciseForm.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-        exerciseForm.submit();
+        const userId = document.getElementById("uid").value;
+        const description = document.getElementById("desc").value;
+        const duration = document.getElementById("dur").value;
+        const date = document.getElementById("date").value;
+
+        fetch(`/api/v1/users/${userId}/exercises`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            description,
+            duration,
+            date,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            alert(
+              `Exercise added for user ID ${userId}: ${data.description}, Duration: ${data.duration} mins, Date: ${data.date}`
+            );
+            console.log("Success:", data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       });
 
       document.addEventListener("DOMContentLoaded", async () => {

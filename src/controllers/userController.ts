@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-const { Database } = require("sqlite-async");
 
 function getDB(req: Request) {
   return req.app.locals.db;
@@ -37,5 +36,39 @@ export const createUser = async (req: Request, res: Response) => {
       console.error("User creation error:", err);
       res.status(500).json({ error: "Server error" });
     }
+  }
+};
+
+export const createExercise = async (req: Request, res: Response) => {
+  const db = getDB(req);
+  const { description, duration, date } = req.body;
+  const userId = req.user.id; // incoming accepted user ID from middleware
+
+  if (!description || !duration) {
+    return res
+      .status(400)
+      .json({ error: "Description and duration are required" });
+  }
+
+  const exerciseDate = date ? new Date(date) : new Date();
+  const dateISO = exerciseDate.toISOString();
+  const dateString = exerciseDate.toDateString();
+
+  try {
+    const result = await db.run(
+      "INSERT INTO exercises (userId, description, duration, date) VALUES (?, ?, ?, ?)",
+      [userId, description, parseInt(duration), dateISO]
+    );
+
+    res.json({
+      exerciseId: result.lastID,
+      userId: userId,
+      duration: parseInt(duration),
+      description,
+      date: dateString,
+    });
+  } catch (err) {
+    console.error("Exercise creation error:", err);
+    res.status(500).json({ error: "Server error" });
   }
 };

@@ -6,6 +6,7 @@ import {
 
 export const getAllUsers = async (req: Request, res: Response) => {
   const { userModel } = req.app.locals;
+
   try {
     const users = await userModel.getAll();
     res.json(users);

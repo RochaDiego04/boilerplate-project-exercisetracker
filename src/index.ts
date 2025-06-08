@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 import { AddressInfo } from "net";
 import app from "./app";
 import { closeDB, initializeDB } from "./database/database";
+import { UserModel } from "./models/User";
+import { ExerciseModel } from "./models/Exercise";
 
 dotenv.config();
 
@@ -9,7 +11,10 @@ const PORT: string | number = process.env.PORT || 3000;
 
 initializeDB()
   .then((db) => {
+    // Initialize models here
     app.locals.db = db;
+    app.locals.userModel = new UserModel(db);
+    app.locals.exerciseModel = new ExerciseModel(db);
 
     const server = app.listen(PORT, () => {
       const serverAddress = server.address() as AddressInfo;

@@ -92,6 +92,20 @@
       </div>
     </div>
     <script>
+      function validateDate(dateString) {
+        const [year, month, day] = dateString.split("-").map(Number);
+        const date = new Date(dateString);
+        if (
+          isNaN(date.getTime()) ||
+          date.getUTCFullYear() !== year ||
+          date.getUTCMonth() + 1 !== month ||
+          date.getUTCDate() !== day
+        ) {
+          throw new Error("Date must be a valid calendar date");
+        }
+        return true;
+      }
+
       const exerciseForm = document.getElementById("exercise-form");
 
       exerciseForm.addEventListener("submit", (e) => {
@@ -136,8 +150,8 @@
         const limit = document.getElementById("logs__limit").value;
 
         const params = new URLSearchParams();
-        if (fromDate) params.append("from", fromDate);
-        if (toDate) params.append("to", toDate);
+        if (fromDate && validateDate(fromDate)) params.append("from", fromDate);
+        if (toDate && validateDate(toDate)) params.append("to", toDate);
         if (limit) params.append("limit", limit);
 
         const url = `/api/v1/users/${userId}/logs?${params.toString()}`;

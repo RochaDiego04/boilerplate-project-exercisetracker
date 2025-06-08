@@ -24,7 +24,7 @@ export async function initializeDB() {
   }
 }
 
-async function createTables(db) {
+async function createTables(db: any) {
   await db.exec(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,7 +43,7 @@ async function createTables(db) {
   console.log("Database tables created/verified");
 }
 
-export async function closeDB(db) {
+export async function closeDB(db: { close: () => any }) {
   try {
     await db.close();
     console.log("Database closed");

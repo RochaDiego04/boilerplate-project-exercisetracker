@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from "express";
 import cors from "cors";
 
 import userRouter from "./routes/userRoutes";
+import { UserModel } from "./models/User";
+import { ExerciseModel } from "./models/Exercise";
 
 const app: Express = express();
 
@@ -9,6 +11,8 @@ declare module "express" {
   interface Application {
     locals: {
       db: any;
+      userModel: UserModel;
+      exerciseModel: ExerciseModel;
     };
   }
 }

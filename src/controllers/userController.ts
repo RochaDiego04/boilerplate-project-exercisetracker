@@ -3,6 +3,7 @@ import {
   CreatedExerciseResponse,
   UserExerciseLog,
 } from "../interfaces/Exercise";
+import { isValidDate } from "../utils/dateValidator";
 
 export const getAllUsers = async (req: Request, res: Response) => {
   const { userModel } = req.app.locals;
@@ -45,6 +46,18 @@ export const getUserLogs = async (req: Request, res: Response) => {
     return res.status(400).json({ error: "User ID missing" });
   }
 
+  if (from && (typeof from !== "string" || !isValidDate(from))) {
+    return res
+      .status(400)
+      .json({ error: "Invalid 'from' date format. Use yyyy-mm-dd" });
+  }
+
+  if (to && (typeof to !== "string" || !isValidDate(to))) {
+    return res
+      .status(400)
+      .json({ error: "Invalid 'to' date format. Use yyyy-mm-dd" });
+  }
+
   try {
     const exercises = await exerciseModel.findByUserId(userId, {
       from: from as string,
@@ -71,14 +84,20 @@ export const createExercise = async (req: Request, res: Response) => {
   const { description, duration, date } = req.body;
   const userId = req.user?.id; // incoming accepted user ID from middleware
 
+  if (!userId) {
+    return res.status(400).json({ error: "User ID missing" });
+  }
+
   if (!description || !duration) {
     return res
       .status(400)
       .json({ error: "Description and duration are required" });
   }
 
-  if (!userId) {
-    return res.status(400).json({ error: "User ID missing" });
+  if (date && (typeof date !== "string" || !isValidDate(date))) {
+    return res
+      .status(400)
+      .json({ error: "Invalid date format. Use yyyy-mm-dd" });
   }
 
   const exerciseDate = date ? new Date(date) : new Date();

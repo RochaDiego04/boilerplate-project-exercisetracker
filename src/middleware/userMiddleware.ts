@@ -1,15 +1,12 @@
 import { Request, Response, NextFunction } from "express";
+import { User } from "../interfaces/User";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: { id: string; username: string };
+      user?: User;
     }
   }
-}
-
-function getDB(req: Request) {
-  return req.app.locals.db;
 }
 
 export const checkUserExists = async (
@@ -17,23 +14,18 @@ export const checkUserExists = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userId = req.params._id;
+  const userId = parseInt(req.params._id);
+  const { userModel } = req.app.locals;
 
-  if (!userId) {
+  if (!userId || isNaN(userId)) {
     return res.status(400).json({ error: "User id is required" });
   }
 
-  const db = getDB(req);
-
   try {
-    const user = await db.get("SELECT id, username FROM users WHERE id = ?", [
-      userId,
-    ]);
-
+    const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
     req.user = user;
     next();
   } catch (err) {

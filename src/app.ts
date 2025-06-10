@@ -19,8 +19,7 @@ export function createApp(
     res.sendFile(__dirname + "/views/index.html");
   });
 
-  // Inject models into router
-  app.use("/api/v1/users", createUserRouter(userModel, exerciseModel));
+  app.use("/api/users", createUserRouter(userModel, exerciseModel));
 
   return app;
 }

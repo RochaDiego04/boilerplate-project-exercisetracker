@@ -25,14 +25,14 @@ describe("User Routes", () => {
     jest.clearAllMocks();
   });
 
-  test("POST /api/v1/users - creates user", async () => {
+  test("POST /api/users - creates user", async () => {
     mockUserModel.create.mockResolvedValue({
       id: 1,
       username: "testuser",
     });
 
     const response = await request(app)
-      .post("/api/v1/users")
+      .post("/api/users")
       .send({ username: "testuser" });
 
     expect(response.status).toBe(200);

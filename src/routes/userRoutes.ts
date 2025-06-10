@@ -14,9 +14,7 @@ export function createUserRouter(
   const checkUserExists = createCheckUserExists(userModel);
 
   router.route("/").get(getAllUsers).post(createUser);
-
   router.route("/:_id/exercises").post(checkUserExists, createExercise);
-
   router.route("/:_id/logs").get(checkUserExists, getUserLogs);
 
   return router;

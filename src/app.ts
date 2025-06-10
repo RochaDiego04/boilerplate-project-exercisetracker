@@ -15,10 +15,6 @@ export function createApp(
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
-  app.use((_req: Request, res: Response) => {
-    res.status(404).json({ error: "Endpoint not found" });
-  });
-
   app.get("/", (_req: Request, res: Response) => {
     res.sendFile(__dirname + "/views/index.html");
   });

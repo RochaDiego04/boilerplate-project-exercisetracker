@@ -31,6 +31,26 @@ export class ExerciseModel {
     };
   }
 
+  async countByUserId(
+    userId: number,
+    filters: ExerciseFilters = {}
+  ): Promise<number> {
+    let query = "SELECT COUNT(*) as count FROM exercises WHERE userId = ?";
+    const params: any[] = [userId];
+
+    if (filters.from) {
+      query += " AND date(date) >= date(?)";
+      params.push(filters.from);
+    }
+    if (filters.to) {
+      query += " AND date(date) <= date(?)";
+      params.push(filters.to);
+    }
+
+    const result = await this.db.get(query, ...params);
+    return result.count;
+  }
+
   async findByUserId(
     userId: number,
     filters: ExerciseFilters = {}
@@ -46,6 +66,9 @@ export class ExerciseModel {
       query += " AND date(date) <= date(?)";
       params.push(filters.to);
     }
+
+    query += " ORDER BY date(date) ASC";
+
     if (filters.limit) {
       query += " LIMIT ?";
       params.push(filters.limit);

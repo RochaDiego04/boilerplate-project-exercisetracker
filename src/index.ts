@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { AddressInfo } from "net";
-import app from "./app";
+import { createApp } from "./app";
 import { closeDB, initializeDB } from "./database/database";
 import { UserModel } from "./models/User";
 import { ExerciseModel } from "./models/Exercise";
@@ -11,7 +11,8 @@ const PORT: string | number = process.env.PORT || 3000;
 
 initializeDB()
   .then((db) => {
-    // Initialize models here
+    const app = createApp();
+
     app.locals.db = db;
     app.locals.userModel = new UserModel(db);
     app.locals.exerciseModel = new ExerciseModel(db);

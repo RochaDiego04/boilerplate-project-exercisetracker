@@ -1,8 +1,13 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
-import userRouter from "./routes/userRoutes";
+import { createUserRouter } from "./routes/userRoutes";
+import { UserModel } from "./models/User";
+import { ExerciseModel } from "./models/Exercise";
 
-export function createApp(): Express {
+export function createApp(
+  userModel: UserModel,
+  exerciseModel: ExerciseModel
+): Express {
   const app: Express = express();
 
   app.use(cors());
@@ -14,7 +19,8 @@ export function createApp(): Express {
     res.sendFile(__dirname + "/views/index.html");
   });
 
-  app.use("/api/v1/users", userRouter);
+  // Inject models into router
+  app.use("/api/v1/users", createUserRouter(userModel, exerciseModel));
 
   return app;
 }

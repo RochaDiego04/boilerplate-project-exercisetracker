@@ -1,18 +1,19 @@
 import { Router } from "express";
-import {
-  createExercise,
-  createUser,
-  getAllUsers,
-  getUserLogs,
-} from "../controllers/userController";
-import { checkUserExists } from "../middleware/userMiddleware";
+import { UserModel } from "../models/User";
+import { ExerciseModel } from "../models/Exercise";
+import { createUserController } from "../controllers/userController";
 
-const router: Router = Router();
+export function createUserRouter(
+  userModel: UserModel,
+  exerciseModel: ExerciseModel
+) {
+  const router: Router = Router();
+  const { getAllUsers, createUser, createExercise, getUserLogs } =
+    createUserController(userModel, exerciseModel);
 
-router.route("/").get(getAllUsers).post(createUser);
+  router.route("/").get(getAllUsers).post(createUser);
+  router.route("/:_id/exercises").post(createExercise);
+  router.route("/:_id/logs").get(getUserLogs);
 
-router.route("/:_id/exercises").post(checkUserExists, createExercise);
-
-router.route("/:_id/logs").get(checkUserExists, getUserLogs);
-
-export default router;
+  return router;
+}

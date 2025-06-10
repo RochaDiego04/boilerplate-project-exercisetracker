@@ -60,6 +60,10 @@ export function createUserController(
         .json({ error: "Invalid 'to' date format. Use yyyy-mm-dd" });
     }
 
+    if (limit && (typeof limit !== "string" || isNaN(parseInt(limit)))) {
+      return res.status(400).json({ error: "Invalid limit value" });
+    }
+
     try {
       const exercises = await exerciseModel.findByUserId(userId, {
         from: from as string,

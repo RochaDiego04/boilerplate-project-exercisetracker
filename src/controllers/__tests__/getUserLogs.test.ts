@@ -14,34 +14,40 @@ describe("getUserLogs", () => {
   beforeEach(() => {
     mockReq.params = { _id: "1" };
     mockReq.user = mockUser;
+
+    jest.clearAllMocks();
+    mockExerciseModel.findByUserId.mockResolvedValue([mockExercise]);
+    mockExerciseModel.countByUserId.mockResolvedValue(1);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should return user logs", async () => {
-    const exercises = [mockExercise];
-    mockExerciseModel.findByUserId.mockResolvedValue(exercises);
-
+  it("should return user logs with count", async () => {
     await controller.getUserLogs(mockReq as Request, mockRes as Response);
 
+    expect(mockExerciseModel.countByUserId).toHaveBeenCalledWith(1, {});
     expect(mockExerciseModel.findByUserId).toHaveBeenCalledWith(1, {});
     expect(resJson).toHaveBeenCalledWith({
       id: 1,
       username: "testuser",
       count: 1,
-      logs: exercises,
+      logs: [mockExercise],
     });
   });
 
-  it("should handle date filters", async () => {
+  it("should handle date filters and count", async () => {
     mockReq.query = { from: "2023-01-01", to: "2023-01-31" };
-    const exercises = [mockExercise];
-    mockExerciseModel.findByUserId.mockResolvedValue(exercises);
+
+    mockExerciseModel.countByUserId.mockResolvedValue(5);
 
     await controller.getUserLogs(mockReq as Request, mockRes as Response);
 
+    expect(mockExerciseModel.countByUserId).toHaveBeenCalledWith(1, {
+      from: "2023-01-01",
+      to: "2023-01-31",
+    });
     expect(mockExerciseModel.findByUserId).toHaveBeenCalledWith(1, {
       from: "2023-01-01",
       to: "2023-01-31",
@@ -50,8 +56,34 @@ describe("getUserLogs", () => {
     expect(resJson).toHaveBeenCalledWith({
       id: 1,
       username: "testuser",
-      count: 1,
-      logs: exercises,
+      count: 5,
+      logs: [mockExercise],
+    });
+  });
+
+  it("should handle limit and return correct count", async () => {
+    mockReq.query = { limit: "2" };
+
+    mockExerciseModel.countByUserId.mockResolvedValue(10);
+    mockExerciseModel.findByUserId.mockResolvedValue([
+      { ...mockExercise, id: 1 },
+      { ...mockExercise, id: 2 },
+    ]);
+
+    await controller.getUserLogs(mockReq as Request, mockRes as Response);
+
+    expect(mockExerciseModel.countByUserId).toHaveBeenCalledWith(1, {});
+    expect(mockExerciseModel.findByUserId).toHaveBeenCalledWith(1, {
+      limit: 2,
+    });
+    expect(resJson).toHaveBeenCalledWith({
+      id: 1,
+      username: "testuser",
+      count: 10,
+      logs: [
+        { ...mockExercise, id: 1 },
+        { ...mockExercise, id: 2 },
+      ],
     });
   });
 

@@ -65,6 +65,11 @@ export function createUserController(
     }
 
     try {
+      const total = await exerciseModel.countByUserId(userId, {
+        from: from as string,
+        to: to as string,
+      });
+
       const exercises = await exerciseModel.findByUserId(userId, {
         from: from as string,
         to: to as string,
@@ -74,7 +79,7 @@ export function createUserController(
       const response: UserExerciseLog = {
         id: +userId,
         username: req.user?.username || "",
-        count: exercises.length,
+        count: total,
         logs: exercises,
       };
 

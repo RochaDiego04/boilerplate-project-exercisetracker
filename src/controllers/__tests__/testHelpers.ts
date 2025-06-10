@@ -30,6 +30,7 @@ export const setupControllerTest = () => {
   const mockExerciseModel: jest.Mocked<ExerciseModel> = {
     create: jest.fn(),
     findByUserId: jest.fn(),
+    countByUserId: jest.fn(),
   } as any;
 
   const controller = createUserController(mockUserModel, mockExerciseModel);

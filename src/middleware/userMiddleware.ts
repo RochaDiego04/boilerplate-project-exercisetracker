@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { UserModel } from "../models/User";
 import { User } from "../interfaces/User";
 
 declare global {
@@ -9,27 +10,27 @@ declare global {
   }
 }
 
-export const checkUserExists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const userId = parseInt(req.params._id);
-  const { userModel } = req.app.locals;
+export function createCheckUserExists(userModel: UserModel) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const _id = parseInt(req.params._id);
 
-  if (!userId || isNaN(userId)) {
-    return res.status(400).json({ error: "User id is required" });
-  }
-
-  try {
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    if (!_id || isNaN(_id)) {
+      return res.status(400).json({ error: "User id is required" });
     }
-    req.user = user;
-    next();
-  } catch (err) {
-    console.error("User check error:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-};
+
+    try {
+      const user = await userModel.findById(_id);
+      if (!user) {
+        return res
+          .status(404)
+          .json({ error: `User not found with id: ${_id}` });
+      }
+      req.user = user;
+
+      next();
+    } catch (err) {
+      console.error("User check error:", err);
+      res.status(500).json({ error: "Server error" });
+    }
+  };
+}

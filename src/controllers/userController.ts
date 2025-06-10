@@ -98,10 +98,12 @@ export function createUserController(
       return res.status(400).json({ error: "User ID missing" });
     }
 
-    if (!description || !duration) {
-      return res
-        .status(400)
-        .json({ error: "Description and duration are required" });
+    if (!description) {
+      return res.status(400).json({ error: "Description is required" });
+    }
+
+    if (!duration) {
+      return res.status(400).json({ error: "Duration is required" });
     }
 
     if (date && (typeof date !== "string" || !isValidDate(date))) {

@@ -45,12 +45,23 @@ describe("createExercise", () => {
 
   it("should return 400 when description is missing", async () => {
     mockReq.body.description = undefined;
-    const error = new Error("Description and duration are required");
+    const error = new Error("Description is required");
     mockExerciseModel.create.mockRejectedValue(error);
     await controller.createExercise(mockReq as Request, mockRes as Response);
     expect(resStatus).toHaveBeenCalledWith(400);
     expect(resJson).toHaveBeenCalledWith({
-      error: "Description and duration are required",
+      error: "Description is required",
+    });
+  });
+
+  it("should return 400 when duration is missing", async () => {
+    mockReq.body.duration = undefined;
+    const error = new Error("Duration is required");
+    mockExerciseModel.create.mockRejectedValue(error);
+    await controller.createExercise(mockReq as Request, mockRes as Response);
+    expect(resStatus).toHaveBeenCalledWith(400);
+    expect(resJson).toHaveBeenCalledWith({
+      error: "Duration is required",
     });
   });
 

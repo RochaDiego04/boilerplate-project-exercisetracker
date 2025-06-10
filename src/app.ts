@@ -21,5 +21,9 @@ export function createApp(
 
   app.use("/api/users", createUserRouter(userModel, exerciseModel));
 
+  app.use((_req, res) => {
+    res.status(404).json({ error: "Endpoint not found" });
+  });
+
   return app;
 }

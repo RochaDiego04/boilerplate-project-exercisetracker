@@ -23,12 +23,12 @@ export function createUserController(
   const createUser = async (req: Request, res: Response) => {
     const { username } = req.body;
 
-    if (!username) {
+    if (typeof username !== "string" || !username.trim()) {
       return res.status(400).json({ error: "Username is required" });
     }
 
     try {
-      const user = await userModel.create(username);
+      const user = await userModel.create(username.trim());
       res.json(user);
     } catch (err: any) {
       if (err.message.includes("UNIQUE constraint failed")) {
@@ -104,6 +104,11 @@ export function createUserController(
 
     if (!duration) {
       return res.status(400).json({ error: "Duration is required" });
+    }
+    if (isNaN(parseInt(duration)) || parseInt(duration) <= 0) {
+      return res
+        .status(400)
+        .json({ error: "Duration must be a positive number" });
     }
 
     if (date && (typeof date !== "string" || !isValidDate(date))) {
